@@ -127,19 +127,8 @@ public struct FrameRenderer {
             let r = CGFloat(c[0]) / 255, g = CGFloat(c[1]) / 255, b = CGFloat(c[2]) / 255
             if stroke { ctx.setStrokeColor(red: r, green: g, blue: b, alpha: 1) } else { ctx.setFillColor(red: r, green: g, blue: b, alpha: 1) }
         }
-        // backdrop: sky above the horizon, ground below
-        if !o.idmap && !o.wire {
-            setColour(o.skyIndex, stroke: false); ctx.fill(CGRect(origin: .zero, size: size))
-            var fh = SIMD3(cam.forward.x, 0, cam.forward.z); var rh = SIMD3(cam.right.x, 0, cam.right.z)
-            fh = simd_length(fh) < 1e-6 ? SIMD3(1, 0, 0) : simd_normalize(fh)
-            rh = simd_length(rh) < 1e-6 ? SIMD3(0, 0, 1) : simd_normalize(rh)
-            let far = 4.0e6
-            if let l = proj.project(cam.toCamera(cam.position + fh * far - rh * far)), let r = proj.project(cam.toCamera(cam.position + fh * far + rh * far)) {
-                ctx.beginPath(); ctx.move(to: CGPoint(x: l.x, y: l.y)); ctx.addLine(to: CGPoint(x: r.x, y: r.y))
-                ctx.addLine(to: CGPoint(x: r.x, y: size.height + 4)); ctx.addLine(to: CGPoint(x: l.x, y: size.height + 4)); ctx.closePath()
-                setColour(o.groundIndex, stroke: false); ctx.fillPath()
-            }
-        }
+        // backdrop: the sky; the ground is filled after the horizon strips (the pod's ground polygon covers their bottom rows)
+        if !o.idmap && !o.wire { setColour(o.skyIndex, stroke: false); ctx.fill(CGRect(origin: .zero, size: size)) }
         stats.track = trackIndex
         // the horizon
         if !o.idmap && !o.wire, let hz = track?.horizon {
@@ -197,6 +186,17 @@ public struct FrameRenderer {
                     ctx.draw(strip, in: CGRect(x: r.minX, y: 0, width: r.width, height: r.height)); ctx.restoreGState()
                 }
                 ctx.restoreGState()
+            }
+        }
+        if !o.idmap && !o.wire {
+            var fh = SIMD3(cam.forward.x, 0, cam.forward.z); var rh = SIMD3(cam.right.x, 0, cam.right.z)
+            fh = simd_length(fh) < 1e-6 ? SIMD3(1, 0, 0) : simd_normalize(fh)
+            rh = simd_length(rh) < 1e-6 ? SIMD3(0, 0, 1) : simd_normalize(rh)
+            let far = 4.0e6
+            if let l = proj.project(cam.toCamera(cam.position + fh * far - rh * far)), let r = proj.project(cam.toCamera(cam.position + fh * far + rh * far)) {
+                ctx.beginPath(); ctx.move(to: CGPoint(x: l.x, y: l.y)); ctx.addLine(to: CGPoint(x: r.x, y: r.y))
+                ctx.addLine(to: CGPoint(x: r.x, y: size.height + 4)); ctx.addLine(to: CGPoint(x: l.x, y: size.height + 4)); ctx.closePath()
+                setColour(o.groundIndex, stroke: false); ctx.fillPath()
             }
         }
         struct Inst { var key: Double; var faces: [DrawnFace]; var isCar = false; var tag = 0 }
