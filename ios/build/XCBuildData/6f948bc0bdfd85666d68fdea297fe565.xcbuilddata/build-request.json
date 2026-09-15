@@ -16,7 +16,6 @@
   "hideShellScriptEnvironment" : false,
   "parameters" : {
     "action" : "build",
-    "configurationName" : "Debug",
     "overrides" : {
       "commandLine" : {
         "table" : {

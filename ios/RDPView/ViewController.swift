@@ -21,10 +21,8 @@ final class ViewController: UIViewController {
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if render.world == nil {
-            // a saved URL fetches on its own; only an unconfigured app asks
-            if let url = defaults.string(forKey: "bundleURL"), !url.isEmpty { fetchBundle(url) } else { showSettings() }
-        }
+        // a saved URL is fetched on every launch (the cached copy in Documents only bridges the gap); an unconfigured app asks
+        if let url = defaults.string(forKey: "bundleURL"), !url.isEmpty { fetchBundle(url) } else if render.world == nil { showSettings() }
     }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
     override var prefersStatusBarHidden: Bool { true }

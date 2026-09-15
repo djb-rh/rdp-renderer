@@ -1,0 +1,61 @@
+{
+  "" : {
+    "const-values" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary.swiftconstvalues",
+    "dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary.d",
+    "diagnostics" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary.dia",
+    "emit-module-dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary-emit-module.dia",
+    "pch" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary.swiftdeps"
+  },
+  "/Users/djb/Developer/rdp-renderer/Sources/RDPKit/Camera.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Camera.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Camera.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Camera.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/Sources/RDPKit/FrameRenderer.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/FrameRenderer.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/FrameRenderer.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/FrameRenderer.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/Sources/RDPKit/Link.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Link.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Link.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Link.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/Sources/RDPKit/Painter.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Painter.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Painter.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Painter.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/Sources/RDPKit/State.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/State.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/State.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/State.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/Sources/RDPKit/Transport.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Transport.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Transport.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/Transport.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/Sources/RDPKit/World.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/World.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/World.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/World.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/ios/RDPView/AppDelegate.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/ios/RDPView/RenderView.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.o"
+  },
+  "/Users/djb/Developer/rdp-renderer/ios/RDPView/ViewController.swift" : {
+    "index-unit-output-path" : "/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Release-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.o"
+  }
+}
