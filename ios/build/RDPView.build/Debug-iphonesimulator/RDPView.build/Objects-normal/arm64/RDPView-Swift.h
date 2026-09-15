@@ -394,6 +394,7 @@ SWIFT_CLASS("_TtC7RDPView10RenderView")
 SWIFT_CLASS("_TtC7RDPView14ViewController")
 @interface ViewController : UIViewController
 - (void)viewDidLoad;
+- (void)viewDidAppear:(BOOL)animated;
 @property (nonatomic, readonly) BOOL prefersHomeIndicatorAutoHidden;
 @property (nonatomic, readonly) BOOL prefersStatusBarHidden;
 - (void)showSettings;

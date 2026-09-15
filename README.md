@@ -25,6 +25,17 @@ your own dumps.
 object model that decodes (vertices, faces as `[colour, v0, v1, ...]`,
 catalogue radius / LOD / cull), names, and the palette banks.
 
+## iPad
+
+`ios/RDPView.xcodeproj` is a UIKit app that compiles RDPKit's sources
+directly (no package dependency to resolve). Open it in Xcode, set your
+team, run it on the iPad. On first launch it asks for the bundle URL, the
+UDP port and the pod yaw; after that it fetches the bundle itself. Serve the
+bundle from the Mac with `python3 -m http.server 8000` in the bundle folder,
+and point podlink's `--udp` at the iPad's address. Tap the view to change
+settings. Verified in the simulator against MAME's Panorama over the loopback
+link.
+
 ## Feeding it
 
 * **Capture replay**: `--replay file.bin`, with `file.bin.times` beside it

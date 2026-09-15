@@ -18,7 +18,13 @@ final class ViewController: UIViewController {
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showSettings)))
         Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in self?.updateStatus() }
         applySettings()
-        if render.world == nil { showSettings() }
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if render.world == nil {
+            // a saved URL fetches on its own; only an unconfigured app asks
+            if let url = defaults.string(forKey: "bundleURL"), !url.isEmpty { fetchBundle(url) } else { showSettings() }
+        }
     }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
     override var prefersStatusBarHidden: Bool { true }
