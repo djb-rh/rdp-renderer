@@ -27,6 +27,8 @@ public struct RenderOptions {
 
 public struct RenderStats {
     public var track = -1, faces = 0, cars = 0
+    public var horizonStrips = 0, horizonSlices = 0   // what the pod-style horizon drew this frame (0 = none)
+    public var horizonNote = ""                       // why nothing was drawn, when nothing was
     public var pose: Pose?
 }
 
@@ -103,7 +105,7 @@ public struct FrameRenderer {
     public init(options: RenderOptions = RenderOptions()) { self.options = options }
 
     @discardableResult
-    public func draw(in ctx: CGContext, size: CGSize, world: World, state: LinkState) -> RenderStats {
+    public mutating func draw(in ctx: CGContext, size: CGSize, world: World, state: LinkState) -> RenderStats {
         var stats = RenderStats()
         let o = options
         ctx.setShouldAntialias(false)
@@ -134,7 +136,10 @@ public struct FrameRenderer {
         // the horizon
         if !o.idmap && !o.wire, let hz = track?.horizon {
             var hi = horizonCache[trackIndex]
-            if hi == nil, let built = HorizonImage(horizon: hz, palette: pal) { hi = built }
+            if hi == nil, let built = HorizonImage(horizon: hz, palette: pal) { hi = built; horizonCache[trackIndex] = built }
+            if hi == nil { stats.horizonNote = "no image (\(hz.pixels.count) px of \(hz.width)x\(hz.rows))" }
+            else if hi!.strips.isEmpty { stats.horizonNote = "no strips (\(hz.strips?.count ?? -1) in bundle)" }
+            else if PodHorizon(right: cam.right, up: cam.up, forward: cam.forward) == nil { stats.horizonNote = "pod horizon nil" }
             if let hi = hi, !hi.strips.isEmpty, let ph = PodHorizon(right: cam.right, up: cam.up, forward: cam.forward) {
                 // the pod's way: two adjacent strips of the 3584-px panorama, each blitted in vertical slices that step
                 // one row per slice so the strip follows the rolled horizon line from rowL (x = 0) to rowR (x = 512)
@@ -143,6 +148,7 @@ public struct FrameRenderer {
                 let i = ph.panX / 512
                 for (s, xs) in [(i, ph.panX - 512 * i), ((i + 1) % 7, ph.panX - 512 * (i + 1))] {
                     guard s < hi.strips.count, s < (hz.strips?.count ?? 0) else { continue }
+                    stats.horizonStrips += 1
                     let img = hi.strips[s]; let h = hz.strips![s].height
                     let rowdiff = ph.rowR - ph.rowL
                     let count = abs(rowdiff) + 1, ystep = rowdiff < 0 ? -1 : 1
@@ -154,6 +160,7 @@ public struct FrameRenderer {
                         let x1 = xacc >> 16
                         let w = x1 - x0
                         if x1 >= 0 && x0 <= 0x1FF && w > 0, let part = img.cropping(to: CGRect(x: col, y: 0, width: w, height: h)) {
+                            stats.horizonSlices += 1
                             let y = Double((y16 >> 16) - 96)
                             let r = CGRect(x: Double(x0) * sx, y: y * sy, width: Double(w) * sx, height: Double(h) * sy)
                             ctx.saveGState(); ctx.translateBy(x: 0, y: r.maxY); ctx.scaleBy(x: 1, y: -1)
@@ -163,7 +170,7 @@ public struct FrameRenderer {
                     }
                 }
                 ctx.restoreGState()
-            } else if let hi = hi {
+            } else if let hi = hi, hi.strips.isEmpty {
                 // legacy bundles: seven fitted angular segments of the sheet, scrolled by heading, lifted by pitch
                 let headingDeg = (atan2(cam.forward.z, cam.forward.x) * 180 / .pi + 360).truncatingRemainder(dividingBy: 360)
                 let scale = size.width / 512.0

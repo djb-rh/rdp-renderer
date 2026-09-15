@@ -47,7 +47,7 @@ if let kv = opt("--ky"), let k = Double(kv) { renderOptions.kyOverride = k }
 if let kv = opt("--cy"), let k = Double(kv) { renderOptions.cyOverride = k }
 if let e = opt("--eye") { let v = e.split(separator: ",").compactMap { Double($0) }; if v.count == 3 { renderOptions.eyeOffset = SIMD3(v[0], v[1], v[2]) } }
 renderOptions.fillNear = Double(opt("--fillnear") ?? "200") ?? 200; renderOptions.skyIndex = skyIndex; renderOptions.groundIndex = groundIndex; renderOptions.defaultTrack = defaultTrack; renderOptions.shading = shading
-let renderer = FrameRenderer(options: renderOptions)
+var renderer = FrameRenderer(options: renderOptions)
 
 final class WorldView: NSView {
     override var isFlipped: Bool { true }
@@ -55,7 +55,7 @@ final class WorldView: NSView {
         guard let ctx = NSGraphicsContext.current?.cgContext else { return }
         let stats = renderer.draw(in: ctx, size: bounds.size, world: world, state: instantState ?? receiver.state)
         if snapshot == nil {
-            let s = stats.pose.map { String(format: "track %d  pos %d %d %d  cars %d  faces %d  packets %d", stats.track, $0.x, $0.y, $0.z, $0.cars.count, stats.faces, receiver.state.packets) } ?? "waiting for the link... packets \(receiver.state.packets)"
+            let s = stats.pose.map { String(format: "track %d  pos %d %d %d  cars %d  faces %d  hz %d/%d  packets %d", stats.track, $0.x, $0.y, $0.z, $0.cars.count, stats.faces, stats.horizonStrips, stats.horizonSlices, receiver.state.packets) } ?? "waiting for the link... packets \(receiver.state.packets)"
             s.draw(at: NSPoint(x: 10, y: 10), withAttributes: [.foregroundColor: NSColor.white, .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)])
         }
     }

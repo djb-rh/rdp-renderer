@@ -31,7 +31,7 @@ final class ViewController: UIViewController {
 
     func updateStatus() {
         let s = render.lastStats
-        if let p = s.pose { status.text = String(format: "track %d  pos %d %d %d  cars %d  faces %d  packets %d  port %d  yaw %.0f", s.track, p.x, p.y, p.z, p.cars.count, s.faces, receiver?.state.packets ?? 0, defaults.integer(forKey: "port"), defaults.double(forKey: "yaw")) }
+        if let p = s.pose { status.text = String(format: "track %d  pos %d %d %d  cars %d  faces %d  hz %d/%d %@  packets %d  port %d  yaw %.0f", s.track, p.x, p.y, p.z, p.cars.count, s.faces, s.horizonStrips, s.horizonSlices, s.horizonNote, receiver?.state.packets ?? 0, defaults.integer(forKey: "port"), defaults.double(forKey: "yaw")) }
         else { status.text = render.world == nil ? "tap for settings: bundle URL, port, pod angle" : "waiting for the link on udp \(defaults.integer(forKey: "port"))... packets \(receiver?.state.packets ?? 0)" }
     }
 
