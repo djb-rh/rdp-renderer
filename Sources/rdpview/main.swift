@@ -32,7 +32,7 @@ let cullSign = Double(opt("--cull") ?? "-1") ?? -1
 let wire = args.contains("--wire")
 let idmap = args.contains("--idmap")
 let lightArg = (opt("--light") ?? "0,1,0").split(separator: ",").compactMap { Double($0) }
-var shading = Shading(); shading.light = simd_normalize(SIMD3(lightArg[0], lightArg[1], lightArg[2])); shading.cameraSpace = args.contains("--camlight"); shading.perObject = !args.contains("--facelight")
+var shading = Shading(); if opt("--light") != nil { shading.light = simd_normalize(SIMD3(lightArg[0], lightArg[1], lightArg[2])) }; if args.contains("--worldlight") { shading.cameraSpace = false }; if args.contains("--objlight") { shading.perObject = true }; if let sv = opt("--lscale"), let d = Double(sv) { shading.scale = d }
 if let a = opt("--ambient"), let v = Double(a) { shading.ambient = v }
 let rawColours = args.contains("--raw")
 let skyIndex = Int(opt("--sky") ?? "28") ?? 28, groundIndex = Int(opt("--ground") ?? "12") ?? 12     // fill each face with its attribute (R = colour, G = attr>>8) for calibration
@@ -42,7 +42,7 @@ var renderOptions = RenderOptions()
 renderOptions.yawDegrees = yaw; renderOptions.pitchDegrees = pitch; renderOptions.bank = bank; renderOptions.cullSign = cullSign
 renderOptions.wire = wire; renderOptions.idmap = idmap; renderOptions.rawColours = rawColours
 renderOptions.objectKeyMode = Int(opt("--objkey") ?? "0") ?? 0; if let kv = opt("--k"), let k = Double(kv) { renderOptions.kOverride = k }
-renderOptions.horizonSectors = args.contains("--sectors"); renderOptions.lodMode = Int(opt("--lod") ?? "0") ?? 0
+renderOptions.horizonSectors = args.contains("--sectors"); renderOptions.lodMode = Int(opt("--lod") ?? "0") ?? 0; renderOptions.idmapNormals = args.contains("--nmap"); if renderOptions.idmapNormals { renderOptions.idmap = true }
 if let kv = opt("--ky"), let k = Double(kv) { renderOptions.kyOverride = k }
 if let kv = opt("--cy"), let k = Double(kv) { renderOptions.cyOverride = k }
 if let e = opt("--eye") { let v = e.split(separator: ",").compactMap { Double($0) }; if v.count == 3 { renderOptions.eyeOffset = SIMD3(v[0], v[1], v[2]) } }
@@ -83,7 +83,7 @@ if let path = snapshot {
         view.draw(view.bounds)
         NSGraphicsContext.restoreGraphicsState()
         try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
-        if let pose = (instantState ?? receiver.state).predicted() { let cam = Camera(pose: pose, yawDegrees: renderOptions.yawDegrees, pitchDegrees: renderOptions.pitchDegrees); let hdg = (atan2(cam.forward.x, cam.forward.z) * 180 / .pi + 360).truncatingRemainder(dividingBy: 360); print(String(format: "pose x %d y %d z %d  camera heading %.1f  pitch %.3f", pose.x, pose.y, pose.z, hdg, cam.forward.y)) }
+        if let pose = (instantState ?? receiver.state).predicted() { let cam = Camera(pose: pose, yawDegrees: renderOptions.yawDegrees, pitchDegrees: renderOptions.pitchDegrees); let hdg = (atan2(cam.forward.x, cam.forward.z) * 180 / .pi + 360).truncatingRemainder(dividingBy: 360); print(String(format: "pose x %d y %d z %d  camera heading %.1f  pitch %.3f", pose.x, pose.y, pose.z, hdg, cam.forward.y)); let st = (instantState ?? receiver.state); for c in pose.cars { print(String(format: "car slot %d obj %d x %d y %d z %d heading %.4f rad", c.slot, c.slot < st.roster.count ? st.roster[c.slot] : -1, c.x, c.y, c.z, c.headingRadians)) } }
         print("wrote \(path); packets \(receiver.state.packets)")
         exit(0)
     }

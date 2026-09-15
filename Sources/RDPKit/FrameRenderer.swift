@@ -16,6 +16,7 @@ public struct RenderOptions {
     public var objectKeyMode = 0        // 0: z + radius - 400 + bias, 1: z + bias, 2: max face key, 3: z - 400 + bias
     public var fillNear = 200.0
     public var kOverride: Double? = nil      // projection constant for a 512-wide view (default 508)
+    public var idmapNormals = false         // idmap encodes the normal index (r,g) and cars in blue instead of the attribute
     public var lodMode = 0                  // 0 = the catalogue's LOD distance, 1 = always the near model, 2 = always the far model
     public var horizonSectors = false      // gate strips by the fitted heading sectors (legacy; the 3584-px wrap makes it unnecessary)
     public var kyOverride: Double? = nil     // vertical projection constant for a 192-tall view (default = k)
@@ -198,9 +199,9 @@ public struct FrameRenderer {
                 ctx.restoreGState()
             }
         }
-        struct Inst { var key: Double; var faces: [DrawnFace] }
+        struct Inst { var key: Double; var faces: [DrawnFace]; var isCar = false; var tag = 0 }
         var insts: [Inst] = []
-        for pl in world.track(trackIndex)?.placements ?? [] {
+        for (pi, pl) in (world.track(trackIndex)?.placements ?? []).enumerated() {
             guard let obj = world.object(pl.o) else { continue }
             let p = SIMD3(Double(pl.p[0]), Double(pl.p[1]), Double(pl.p[2]))
             let d = simd_length(p - cam.position)
@@ -213,20 +214,20 @@ public struct FrameRenderer {
             if fs.isEmpty { continue }
             let cz = cam.toCamera(p).z
             let key: Double = o.objectKeyMode == 1 ? cz + Double(pl.bias) : o.objectKeyMode == 2 ? (fs.map { $0.key }.max() ?? cz) : o.objectKeyMode == 3 ? cz - 400 + Double(pl.bias) : cz + Double(obj.radius) - 400 + Double(pl.bias)
-            insts.append(Inst(key: key, faces: fs.sorted { $0.key > $1.key }))
+            insts.append(Inst(key: key, faces: fs.sorted { $0.key > $1.key }, tag: pi))
         }
         for car in pose.cars {
             guard car.slot < state.roster.count, let obj = world.object(state.roster[car.slot]) else { continue }
             let p = SIMD3(Double(car.x), Double(car.y), Double(car.z)); let h = car.headingRadians
             let rot: (SIMD3<Double>) -> SIMD3<Double> = { w in SIMD3(w.x * cos(h) + w.z * sin(h), w.y, -w.x * sin(h) + w.z * cos(h)) }
             let fs = painter.faces(verts: obj.verts, faces: obj.faces, normals: obj.normals, rotate: rot, transform: { rot($0) + p }, camera: cam)
-            if !fs.isEmpty { insts.append(Inst(key: cam.toCamera(p).z, faces: fs.sorted { $0.key > $1.key })); stats.cars += 1 }
+            if !fs.isEmpty { insts.append(Inst(key: cam.toCamera(p).z, faces: fs.sorted { $0.key > $1.key }, isCar: true, tag: 60000 + car.slot)); stats.cars += 1 }
         }
         insts.sort { $0.key > $1.key }
         ctx.setLineWidth(1)
         for inst in insts {
             for f in inst.faces {
-                if o.idmap { ctx.setFillColor(red: CGFloat(f.attr & 0xFF) / 255, green: CGFloat(f.attr >> 8) / 255, blue: 1, alpha: 1) }
+                if o.idmap { if o.idmapNormals { ctx.setFillColor(red: CGFloat(inst.tag & 0xFF) / 255, green: CGFloat(inst.tag >> 8) / 255, blue: CGFloat(max(0, min(255, f.nidx + 1))) / 255, alpha: 1) } else { ctx.setFillColor(red: CGFloat(f.attr & 0xFF) / 255, green: CGFloat(f.attr >> 8) / 255, blue: 1, alpha: 1) } }
                 else { setColour(f.colour, stroke: o.wire) }
                 ctx.beginPath(); ctx.move(to: CGPoint(x: f.points[0].x, y: f.points[0].y))
                 for q in f.points.dropFirst() { ctx.addLine(to: CGPoint(x: q.x, y: q.y)) }

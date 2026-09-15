@@ -5,6 +5,7 @@ import Foundation
 import simd
 
 public struct DrawnFace {
+    public var nidx: Int = -1               // face normal index (for diagnostics)
     public var points: [SIMD2<Double>]
     public var colour: Int
     public var attr: Int
@@ -14,18 +15,23 @@ public struct DrawnFace {
 /// The ADSP's colour rule (routine 0x021E): a face colour >= 31 is flat, index = colour & 0x1F;
 /// a colour < 31 is lit, index = 16 + colour*16 + shade, shade = clamp((dot(normal, light) + 0.354) * 18, 0, 15).
 public struct Shading {
-    public var light: SIMD3<Double> = SIMD3(0, 1, 0)   // unit light direction, in the space `normalSpace` names
+    /// Unit light direction.  The pod lights in camera space from above and behind the viewer, (0, 1, -1)/sqrt 2:
+    /// fitted to 28 face shades across six frames (rdp-fullscreen NOTES.md "Lighting, fitted"), where a world-fixed
+    /// light cannot reproduce them.
+    public var light: SIMD3<Double> = simd_normalize(SIMD3(0, 1, -1))
     public var ambient: Double = 0.354                  // 0x2D41 / 32768
     public var gain: Double = 18                        // 0x12
-    public var cameraSpace = false                      // dot the normal in camera space instead of world space
-    public var perObject = true                         // light from the object's up axis (rotate(0,1,0)) instead of each face's normal
+    /// MR1 = scale * N.L.  0x2D41 = 8192 * sqrt 2, i.e. the ADSP's 8192 * N.L with an un-normalised (0, 0x4000, -0x4000) light.
+    public var scale: Double = 11585
+    public var cameraSpace = true                       // dot the normal in camera space instead of world space
+    public var perObject = false                        // light from the object's up axis (rotate(0,1,0)) instead of each face's normal
     public init() {}
     /// The ADSP's integer arithmetic: MR1 = (N.L in 1.14 x 1.14, SS) >> 16 = 8192 * N.L; AR = max(0, MR1 + 0x2D41);
     /// shade = (AR * 0x12 * 2) >> 16, OR'ed into the low four bits of (colour << 4) + 16.
     public func index(colour: Int, normal: SIMD3<Double>?) -> Int {
         if colour >= 31 || normal == nil { return colour & 0x1F }
         let d = simd_dot(normal!, light)
-        let ar = max(0, Int((8192.0 * d).rounded()) + 0x2D41)
+        let ar = max(0, Int((scale * d).rounded()) + 0x2D41)
         let shade = (ar * 0x12 * 2 + 0x8000) >> 16          // MR = AR * 0x12 (RND)
         return min(255, ((colour << 4) + 16) | shade)
     }
@@ -93,7 +99,7 @@ public struct Painter {
                 let xs = pts.map { $0.x }
                 pts = [SIMD2(xs.min()!, top), SIMD2(xs.max()!, top), SIMD2(xs.max()!, projection.height), SIMD2(xs.min()!, projection.height)]
             }
-            out.append(DrawnFace(points: pts, colour: colour, attr: attr, key: maxz / 2 + bias))
+            var df = DrawnFace(points: pts, colour: colour, attr: attr, key: maxz / 2 + bias); df.nidx = nidx; out.append(df)
         }
         return out
     }
