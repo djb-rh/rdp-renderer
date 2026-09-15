@@ -128,7 +128,8 @@ public struct FrameRenderer {
             if stroke { ctx.setStrokeColor(red: r, green: g, blue: b, alpha: 1) } else { ctx.setFillColor(red: r, green: g, blue: b, alpha: 1) }
         }
         // backdrop: the sky; the ground is filled after the horizon strips (the pod's ground polygon covers their bottom rows)
-        if !o.idmap && !o.wire { setColour(o.skyIndex, stroke: false); ctx.fill(CGRect(origin: .zero, size: size)) }
+        let skyIndex = track?.horizon?.sky ?? o.skyIndex, groundIndex = track?.horizon?.ground ?? o.groundIndex
+        if !o.idmap && !o.wire { setColour(skyIndex, stroke: false); ctx.fill(CGRect(origin: .zero, size: size)) }
         stats.track = trackIndex
         // the horizon
         if !o.idmap && !o.wire, let hz = track?.horizon {
@@ -196,7 +197,7 @@ public struct FrameRenderer {
             if let l = proj.project(cam.toCamera(cam.position + fh * far - rh * far)), let r = proj.project(cam.toCamera(cam.position + fh * far + rh * far)) {
                 ctx.beginPath(); ctx.move(to: CGPoint(x: l.x, y: l.y)); ctx.addLine(to: CGPoint(x: r.x, y: r.y))
                 ctx.addLine(to: CGPoint(x: r.x, y: size.height + 4)); ctx.addLine(to: CGPoint(x: l.x, y: size.height + 4)); ctx.closePath()
-                setColour(o.groundIndex, stroke: false); ctx.fillPath()
+                setColour(groundIndex, stroke: false); ctx.fillPath()
             }
         }
         struct Inst { var key: Double; var faces: [DrawnFace]; var isCar = false; var tag = 0 }

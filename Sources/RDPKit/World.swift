@@ -28,6 +28,7 @@ public struct Horizon: Decodable {
     public var segments: [HorizonSegment]
     public var px_per_degree: Double
     public var pitch_rows: Double
+    public var sky: Int?, ground: Int?      // the pod's fill colours for this track (palette indices)
     public var strips: [HorizonStrip]?      // panorama order (strip i sits 512*i px along the panorama); nil = legacy segments
     public var pixels: [UInt8] { [UInt8](Data(base64Encoded: data) ?? Data()) }
 }
