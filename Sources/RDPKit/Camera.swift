@@ -27,19 +27,25 @@ public struct Camera {
     }
 }
 
-/// The ADSP's projection: x' = cx + x*k/z, y' = cy - y*k/z, k = 508 for a 512-wide view, near clip z >= 100.
+/// The ADSP's projection: x' = 255 + x*k/z, y' = 255 - y*k/z, k = 508, near clip z >= 100, into a 512x512 space.
+/// The pod's 68010 rasterises that into a 512x384 drawing space (rows scaled by 3/4, so ky = 381) and the
+/// screen shows the middle 192 rows (96..287), which puts the projection centre at visible row 96.
 public struct Projection {
     public var width: Double, height: Double, k: Double, near: Double
+    /// vertical scale and centre row; nil = same k as horizontal, centre = height/2
+    public var ky: Double? = nil, cy: Double? = nil
     public init(width: Double = 512, height: Double = 192, k: Double = 508, near: Double = 100) {
         self.width = width; self.height = height; self.k = k; self.near = near
     }
     public static func faithful(width: Double, height: Double) -> Projection {
         // keep the original horizontal field of view whatever the pixel size
-        Projection(width: width, height: height, k: 508 * width / 512, near: 100)
+        var p = Projection(width: width, height: height, k: 508 * width / 512, near: 100)
+        p.ky = 508 * 0.75 * height / 192
+        return p
     }
     public func project(_ c: SIMD3<Double>) -> SIMD2<Double>? {
         guard c.z >= near else { return nil }
-        return SIMD2(width / 2 + c.x * k / c.z, height / 2 - c.y * k / c.z)
+        return SIMD2(width / 2 + c.x * k / c.z, (cy ?? height / 2) - c.y * (ky ?? k) / c.z)
     }
 }
 

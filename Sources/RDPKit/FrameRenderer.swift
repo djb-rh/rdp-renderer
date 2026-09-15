@@ -14,6 +14,11 @@ public struct RenderOptions {
     public var shading = Shading()
     public var maxDistance = 200000.0
     public var objectKeyMode = 0        // 0: z + radius - 400 + bias, 1: z + bias, 2: max face key, 3: z - 400 + bias
+    public var fillNear = 200.0
+    public var kOverride: Double? = nil      // projection constant for a 512-wide view (default 508)
+    public var kyOverride: Double? = nil     // vertical projection constant for a 192-tall view (default = k)
+    public var cyOverride: Double? = nil     // centre row for a 192-tall view (default 96)
+    public var eyeOffset = SIMD3<Double>(0, 0, 0)   // added to the camera position in the car frame (right, up, forward)
     public init() {}
 }
 
@@ -55,10 +60,15 @@ public struct FrameRenderer {
         ctx.setFillColor(red: 0, green: 0, blue: 0, alpha: 1); ctx.fill(CGRect(origin: .zero, size: size))
         guard let pose = state.predicted() else { return stats }
         stats.pose = pose
-        let cam = Camera(pose: pose, yawDegrees: o.yawDegrees, pitchDegrees: o.pitchDegrees)
-        let proj = Projection.faithful(width: size.width, height: size.height)
+        var cam = Camera(pose: pose, yawDegrees: o.yawDegrees, pitchDegrees: o.pitchDegrees)
+        cam.position += pose.right * o.eyeOffset.x + pose.up * o.eyeOffset.y + pose.forward * o.eyeOffset.z
+        var proj = Projection.faithful(width: size.width, height: size.height)
+        if let k = o.kOverride { proj.k = k * size.width / 512 }
+        if let ky = o.kyOverride { proj.ky = ky * size.height / 192 }
+        if let cy = o.cyOverride { proj.cy = cy * size.height / 192 }
         var painter = Painter(projection: proj); painter.cullSign = o.cullSign; painter.cull = !o.wire
         painter.shading = (o.rawColours || o.idmap) ? nil : o.shading
+        painter.fillNear = o.fillNear
         let trackIndex = state.track >= 0 ? state.track : o.defaultTrack
         let track = world.track(trackIndex)
         let pal = track?.palette ?? (o.bank < world.palette.count ? world.palette[o.bank] : [])
@@ -101,7 +111,8 @@ public struct FrameRenderer {
                     if dx > 0 { dx -= 512 }              // the strip is cyclic: draw it at dx and dx + 512 to cover the width
                     guard let strip = hi.image.cropping(to: CGRect(x: 0, y: seg.rows[0], width: 512, height: h)) else { continue }
                     let y = (Double(seg.row) + pitchRows) * (size.height / 192.0)
-                    for x in [dx, dx + 512] where x < 512 && x + 512 > 0 {
+                    // the strips are angular segments, not cyclic: one copy at dx (measured against the pod)
+                    for x in [dx] where x < 512 && x + 512 > 0 {
                         // CG draws images bottom-up: flip locally so the strip keeps its orientation in this top-left context
                         let r = CGRect(x: x * scale, y: y, width: 512 * scale, height: Double(h) * (size.height / 192.0))
                         ctx.saveGState(); ctx.translateBy(x: 0, y: r.maxY); ctx.scaleBy(x: 1, y: -1)

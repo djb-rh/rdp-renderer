@@ -36,6 +36,7 @@ public struct Painter {
     public var cullSign: Double = 1      // +1 or -1: which winding is a back face
     public var cull = true
     public var shading: Shading? = nil   // nil: colour index = the raw attribute colour (calibration)
+    public var fillNear = 200.0          // type-1 faces are skipped when any vertex is nearer than this
     public init(projection: Projection) { self.projection = projection }
 
     /// Faces of one model instance, projected. Faces are clipped against the near plane (z >= near) the way the
@@ -67,7 +68,7 @@ public struct Painter {
             var poly: [SIMD3<Double>] = []; var ok = true; var maxz = -1e30
             for i in f.dropFirst(2) { guard i < cam.count else { ok = false; break }; poly.append(cam[i]); maxz = max(maxz, cam[i].z) }
             guard ok, poly.count >= 3, maxz >= near else { continue }
-            if type == 1 && poly.contains(where: { $0.z < 200 }) { continue }
+            if type == 1 && poly.contains(where: { $0.z < fillNear }) { continue }
             if poly.contains(where: { $0.z < near }) {
                 var clipped: [SIMD3<Double>] = []
                 for k in 0..<poly.count {
@@ -82,7 +83,7 @@ public struct Painter {
             var pts: [SIMD2<Double>] = []
             for c in poly { guard let p = projection.project(c) else { ok = false; break }; pts.append(p) }
             guard ok else { continue }
-            if cull {
+            if cull && type != 1 {                       // fill faces are not back-face tested
                 var area = 0.0
                 for k in 0..<pts.count { let a = pts[k], b = pts[(k + 1) % pts.count]; area += a.x * b.y - b.x * a.y }
                 if area * cullSign > 0 { continue }

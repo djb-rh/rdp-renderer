@@ -41,7 +41,11 @@ let viewW = Double(opt("--width") ?? "1024") ?? 1024, viewH = Double(opt("--heig
 var renderOptions = RenderOptions()
 renderOptions.yawDegrees = yaw; renderOptions.pitchDegrees = pitch; renderOptions.bank = bank; renderOptions.cullSign = cullSign
 renderOptions.wire = wire; renderOptions.idmap = idmap; renderOptions.rawColours = rawColours
-renderOptions.objectKeyMode = Int(opt("--objkey") ?? "0") ?? 0; renderOptions.skyIndex = skyIndex; renderOptions.groundIndex = groundIndex; renderOptions.defaultTrack = defaultTrack; renderOptions.shading = shading
+renderOptions.objectKeyMode = Int(opt("--objkey") ?? "0") ?? 0; if let kv = opt("--k"), let k = Double(kv) { renderOptions.kOverride = k }
+if let kv = opt("--ky"), let k = Double(kv) { renderOptions.kyOverride = k }
+if let kv = opt("--cy"), let k = Double(kv) { renderOptions.cyOverride = k }
+if let e = opt("--eye") { let v = e.split(separator: ",").compactMap { Double($0) }; if v.count == 3 { renderOptions.eyeOffset = SIMD3(v[0], v[1], v[2]) } }
+renderOptions.fillNear = Double(opt("--fillnear") ?? "200") ?? 200; renderOptions.skyIndex = skyIndex; renderOptions.groundIndex = groundIndex; renderOptions.defaultTrack = defaultTrack; renderOptions.shading = shading
 let renderer = FrameRenderer(options: renderOptions)
 
 final class WorldView: NSView {
@@ -78,6 +82,7 @@ if let path = snapshot {
         view.draw(view.bounds)
         NSGraphicsContext.restoreGraphicsState()
         try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
+        if let pose = receiver.state.predicted() { let cam = Camera(pose: pose, yawDegrees: renderOptions.yawDegrees, pitchDegrees: renderOptions.pitchDegrees); let hdg = (atan2(cam.forward.x, cam.forward.z) * 180 / .pi + 360).truncatingRemainder(dividingBy: 360); print(String(format: "pose x %d y %d z %d  camera heading %.1f  pitch %.3f", pose.x, pose.y, pose.z, hdg, cam.forward.y)) }
         print("wrote \(path); packets \(receiver.state.packets)")
         exit(0)
     }
