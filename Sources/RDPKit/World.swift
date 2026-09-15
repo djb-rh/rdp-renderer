@@ -19,9 +19,21 @@ public struct Placement: Decodable {
     public var flags: Int
 }
 
+public struct HorizonSegment: Decodable { public var rows: [Int]; public var row: Int; public var origin: Double; public var sector: [Double]? }
+public struct Horizon: Decodable {
+    public var width: Int, rows: Int
+    public var data: String                 // base64 palette indices, row-major
+    public var segments: [HorizonSegment]
+    public var px_per_degree: Double
+    public var pitch_rows: Double
+    public var pixels: [UInt8] { [UInt8](Data(base64Encoded: data) ?? Data()) }
+}
+
 public struct Track: Decodable {
     public var names: [String]
     public var placements: [Placement]
+    public var palette: [[Int]]?          // the pod's bank 0 for this track
+    public var horizon: Horizon?
 }
 
 public struct World: Decodable {
