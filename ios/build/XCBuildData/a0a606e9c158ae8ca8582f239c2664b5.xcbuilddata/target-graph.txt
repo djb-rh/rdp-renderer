@@ -1,0 +1,6 @@
+Target dependency graph (3 targets)
+Target 'RDPView' in project 'RDPView'
+➜ Explicit dependency on target 'RDPKit-product' in project 'rdp-renderer'
+Target 'RDPKit-product' in project 'rdp-renderer'
+➜ Explicit dependency on target 'RDPKit' in project 'rdp-renderer'
+Target 'RDPKit' in project 'rdp-renderer' (no dependencies)

@@ -1,0 +1,39 @@
+{
+  "" : {
+    "diagnostics" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary.dia",
+    "emit-module-dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary-emit-module.dia",
+    "pch" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RDPView-primary.swiftdeps"
+  },
+  "/Users/djb/Developer/rdp-renderer/ios/RDPView/AppDelegate.swift" : {
+    "const-values" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.swiftconstvalues",
+    "dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.d",
+    "diagnostics" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.dia",
+    "index-unit-output-path" : "/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.o",
+    "swift-dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate.swiftdeps",
+    "swiftmodule" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/AppDelegate~partial.swiftmodule"
+  },
+  "/Users/djb/Developer/rdp-renderer/ios/RDPView/RenderView.swift" : {
+    "const-values" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.swiftconstvalues",
+    "dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.d",
+    "diagnostics" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.dia",
+    "index-unit-output-path" : "/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.o",
+    "swift-dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView.swiftdeps",
+    "swiftmodule" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/RenderView~partial.swiftmodule"
+  },
+  "/Users/djb/Developer/rdp-renderer/ios/RDPView/ViewController.swift" : {
+    "const-values" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.swiftconstvalues",
+    "dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.d",
+    "diagnostics" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.dia",
+    "index-unit-output-path" : "/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.o",
+    "llvm-bc" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.bc",
+    "object" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.o",
+    "swift-dependencies" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController.swiftdeps",
+    "swiftmodule" : "/Users/djb/Developer/rdp-renderer/ios/build/RDPView.build/Debug-iphonesimulator/RDPView.build/Objects-normal/x86_64/ViewController~partial.swiftmodule"
+  }
+}
