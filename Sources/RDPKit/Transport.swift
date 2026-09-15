@@ -66,6 +66,31 @@ public final class ReplaySource: LinkSource {
     public func stop() { thread?.cancel() }
 }
 
+/// Feeds a capture instantly up to a moment in its own timeline (for deterministic frames).
+public final class InstantReplay {
+    public let state = LinkState()
+    private let framer = LinkFramer()
+    let bytes: [UInt8]; let times: [Double]?
+    public init(url: URL) throws {
+        bytes = [UInt8](try Data(contentsOf: url))
+        if let s = try? String(contentsOfFile: url.path + ".times") {
+            let t = s.split(whereSeparator: { $0 == "\n" || $0 == " " }).compactMap { Double($0) }
+            times = t.count == bytes.count ? t : nil
+        } else { times = nil }
+    }
+    /// Deliver every byte whose time (relative to the first) is <= t.
+    public func feed(upTo t: Double) {
+        let base = times?.first ?? 0
+        var end = 0
+        while end < bytes.count {
+            let when = times.map { $0[end] - base } ?? Double(end) * 10.0 / 38400
+            if when > t { break }
+            end += 1
+        }
+        for p in framer.feed(Array(bytes[0..<end])) { if let pk = LinkFramer.unpack(p) { state.accept(pk, at: 0) } }
+    }
+}
+
 /// Wires a source through the framer into a LinkState.
 public final class LinkReceiver {
     public let state = LinkState()

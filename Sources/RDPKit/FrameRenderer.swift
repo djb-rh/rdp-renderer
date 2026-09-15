@@ -13,6 +13,7 @@ public struct RenderOptions {
     public var defaultTrack = 3
     public var shading = Shading()
     public var maxDistance = 200000.0
+    public var objectKeyMode = 0        // 0: z + radius - 400 + bias, 1: z + bias, 2: max face key, 3: z - 400 + bias
     public init() {}
 }
 
@@ -120,10 +121,12 @@ public struct FrameRenderer {
             if obj.cull == 0 && d > o.maxDistance { continue }
             let far = obj.far, useFar = far != nil && obj.lod > 0 && d > Double(obj.lod)
             let m = pl.m
-            let fs = painter.faces(verts: useFar ? far!.verts : obj.verts, faces: useFar ? far!.faces : obj.faces, normals: useFar ? nil : obj.normals,
+            let fs = painter.faces(verts: useFar ? far!.verts : obj.verts, faces: useFar ? far!.faces : obj.faces, normals: useFar ? far!.normals : obj.normals,
                                    rotate: { rotate14($0, m: m) }, transform: { rotate14($0, m: m) + p }, camera: cam, bias: Double(pl.bias))
             if fs.isEmpty { continue }
-            insts.append(Inst(key: cam.toCamera(p).z + Double(obj.radius) - 400 + Double(pl.bias), faces: fs.sorted { $0.key > $1.key }))
+            let cz = cam.toCamera(p).z
+            let key: Double = o.objectKeyMode == 1 ? cz + Double(pl.bias) : o.objectKeyMode == 2 ? (fs.map { $0.key }.max() ?? cz) : o.objectKeyMode == 3 ? cz - 400 + Double(pl.bias) : cz + Double(obj.radius) - 400 + Double(pl.bias)
+            insts.append(Inst(key: key, faces: fs.sorted { $0.key > $1.key }))
         }
         for car in pose.cars {
             guard car.slot < state.roster.count, let obj = world.object(state.roster[car.slot]) else { continue }

@@ -10,6 +10,8 @@ public final class LinkState {
     public private(set) var track: Int = -1
     public private(set) var packets = 0
     public var maxPrediction: TimeInterval = 0.25
+    /// Faithful mode: no extrapolation, the last packet is held until the next (what the pod does).
+    public var hold = false
 
     public init() {}
 
@@ -35,6 +37,7 @@ public final class LinkState {
         lock.lock(); defer { lock.unlock() }
         guard let l = last else { return nil }
         var p = l.pose
+        if hold { return p }
         if let q = prev, l.at > q.at {
             let dt = min(max(t - l.at, 0), maxPrediction)
             let v = (l.pose.position - q.pose.position) / (l.at - q.at)

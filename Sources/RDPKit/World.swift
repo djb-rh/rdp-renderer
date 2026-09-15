@@ -5,10 +5,10 @@ public struct WorldObject: Decodable {
     public var name: String
     public var radius: Int, lod: Int, cull: Int
     public var verts: [[Int]]
-    public var faces: [[Int]]          // [attr, v0, v1, ...]; colour = attr & 0xFF, type = attr >> 12
-    public var normals: [[Int]]?       // per face, 1.14 fixed
+    public var faces: [[Int]]          // [attr, normal index, v0, v1, ...]; colour = attr & 0xFF, type = attr >> 12
+    public var normals: [[Int]]?       // 1.14 fixed, indexed by the face's normal index
     public var far: FarModel?
-    public struct FarModel: Decodable { public var verts: [[Int]]; public var faces: [[Int]] }
+    public struct FarModel: Decodable { public var verts: [[Int]]; public var faces: [[Int]]; public var normals: [[Int]]? }
 }
 
 public struct Placement: Decodable {

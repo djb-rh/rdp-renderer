@@ -6,9 +6,10 @@ import RDPKit
 import simd
 
 let args = CommandLine.arguments
-guard args.count >= 2 else { print("usage: rdpview world.json (--udp PORT | --replay FILE) [--yaw DEG] [--pitch DEG] [--track N] [--bank B] [--cull 1|-1] [--wire] [--raw] [--sky I] [--ground I] [--light x,y,z] [--camlight] [--ambient A] [--width W --height H] [--snapshot out.png --after S]"); exit(1) }
+guard args.count >= 2 else { print("usage: rdpview world.json (--udp PORT | --replay FILE) [--yaw DEG] [--pitch DEG] [--track N] [--bank B] [--cull 1|-1] [--wire] [--raw] [--sky I] [--ground I] [--light x,y,z] [--camlight] [--ambient A] [--width W --height H] [--snapshot out.png --after S | --at T]"); exit(1) }
 func opt(_ name: String) -> String? { if let i = args.firstIndex(of: name), i + 1 < args.count { return args[i + 1] }; return nil }
 let world = try World.load(URL(fileURLWithPath: args[1]))
+var instantState: LinkState? = nil
 let yaw = Double(opt("--yaw") ?? "0") ?? 0, pitch = Double(opt("--pitch") ?? "0") ?? 0
 let source: LinkSource = {
     if let p = opt("--udp") { return UDPSource(port: UInt16(p) ?? 5000) }
@@ -16,7 +17,13 @@ let source: LinkSource = {
     print("no source: use --udp PORT or --replay FILE"); exit(1)
 }()
 let receiver = LinkReceiver(source: source)
-receiver.start()
+if let at = opt("--at"), let t = Double(at), let f = opt("--replay") {
+    // deterministic: everything up to t, held, one frame, exit
+    let ir = try! InstantReplay(url: URL(fileURLWithPath: f)); ir.feed(upTo: t); ir.state.hold = true
+    instantState = ir.state
+} else {
+    receiver.start()
+}
 let defaultTrack = Int(opt("--track") ?? "3") ?? 3
 print("world: tracks \(world.tracks.keys.sorted()), \(world.objects.count) objects")
 
@@ -25,7 +32,7 @@ let cullSign = Double(opt("--cull") ?? "-1") ?? -1
 let wire = args.contains("--wire")
 let idmap = args.contains("--idmap")
 let lightArg = (opt("--light") ?? "0,1,0").split(separator: ",").compactMap { Double($0) }
-var shading = Shading(); shading.light = simd_normalize(SIMD3(lightArg[0], lightArg[1], lightArg[2])); shading.cameraSpace = args.contains("--camlight")
+var shading = Shading(); shading.light = simd_normalize(SIMD3(lightArg[0], lightArg[1], lightArg[2])); shading.cameraSpace = args.contains("--camlight"); shading.perObject = !args.contains("--facelight")
 if let a = opt("--ambient"), let v = Double(a) { shading.ambient = v }
 let rawColours = args.contains("--raw")
 let skyIndex = Int(opt("--sky") ?? "28") ?? 28, groundIndex = Int(opt("--ground") ?? "12") ?? 12     // fill each face with its attribute (R = colour, G = attr>>8) for calibration
@@ -34,14 +41,14 @@ let viewW = Double(opt("--width") ?? "1024") ?? 1024, viewH = Double(opt("--heig
 var renderOptions = RenderOptions()
 renderOptions.yawDegrees = yaw; renderOptions.pitchDegrees = pitch; renderOptions.bank = bank; renderOptions.cullSign = cullSign
 renderOptions.wire = wire; renderOptions.idmap = idmap; renderOptions.rawColours = rawColours
-renderOptions.skyIndex = skyIndex; renderOptions.groundIndex = groundIndex; renderOptions.defaultTrack = defaultTrack; renderOptions.shading = shading
+renderOptions.objectKeyMode = Int(opt("--objkey") ?? "0") ?? 0; renderOptions.skyIndex = skyIndex; renderOptions.groundIndex = groundIndex; renderOptions.defaultTrack = defaultTrack; renderOptions.shading = shading
 let renderer = FrameRenderer(options: renderOptions)
 
 final class WorldView: NSView {
     override var isFlipped: Bool { true }
     override func draw(_ dirty: NSRect) {
         guard let ctx = NSGraphicsContext.current?.cgContext else { return }
-        let stats = renderer.draw(in: ctx, size: bounds.size, world: world, state: receiver.state)
+        let stats = renderer.draw(in: ctx, size: bounds.size, world: world, state: instantState ?? receiver.state)
         if snapshot == nil {
             let s = stats.pose.map { String(format: "track %d  pos %d %d %d  cars %d  faces %d  packets %d", stats.track, $0.x, $0.y, $0.z, $0.cars.count, stats.faces, receiver.state.packets) } ?? "waiting for the link... packets \(receiver.state.packets)"
             s.draw(at: NSPoint(x: 10, y: 10), withAttributes: [.foregroundColor: NSColor.white, .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)])
@@ -59,7 +66,7 @@ view.autoresizingMask = [.width, .height]
 win.contentView?.addSubview(view)
 if let path = snapshot {
     // headless: wait for the link, draw one frame into a bitmap, write PNG, exit
-    let wait = Double(opt("--after") ?? "4") ?? 4
+    let wait = instantState != nil ? 0.05 : (Double(opt("--after") ?? "4") ?? 4)
     Timer.scheduledTimer(withTimeInterval: wait, repeats: false) { _ in
         // draw into a device-RGB bitmap so palette values reach the PNG unmanaged
         let W = Int(view.bounds.width), H = Int(view.bounds.height)
