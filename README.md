@@ -46,8 +46,14 @@ the Python reference.
 
 ## Status (15 Sep 2026)
 
-Phase 0 done (link decoded, pod camera math measured). Phase 1 started: the
-Mac viewer draws the world as wireframe from the predicted camera, the cars
-the link carries at their positions, and switches track on the roster packet.
-Not yet: filled faces in painter's order, the horizon bands, the palette bank
-at draw time, the MAME frame diff.
+Phase 0 done (link decoded, pod camera math measured). Phase 1 in progress:
+`rdpview` draws filled faces in painter's order with the ADSP's colour and
+shade rule (flat colours >= 31, lit ramps below, light straight up), the sky
+and ground backdrop, the cars the link carries, and switches track on the
+roster packet. At the lap-end pose 85% of its 512x192 pixels are identical to
+the MAME pod's. Not yet: the horizon band stack (a parallax backdrop), the
+per-track palette read from ROM instead of a live dump, frame-locked timing
+for the diff, and the iPad shell.
+
+    rdpview world.json --replay lap.bin --width 512 --height 192 --snapshot out.png --after 40
+    rdpview world.json --udp 5000 --yaw 53          # right pod view, live
