@@ -75,7 +75,7 @@ public struct Painter {
                     let a = poly[k], b = poly[(k + 1) % poly.count]
                     let ain = a.z >= near, bin = b.z >= near
                     if ain { clipped.append(a) }
-                    if ain != bin { let t = (near - a.z) / (b.z - a.z); clipped.append(a + (b - a) * t) }
+                    if ain != bin { let t = (near - a.z) / (b.z - a.z); var c = a + (b - a) * t; c.z = near; clipped.append(c) }   // pin z so the projection guard cannot drop it
                 }
                 poly = clipped
                 guard poly.count >= 3 else { continue }

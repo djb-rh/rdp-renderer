@@ -20,12 +20,15 @@ public struct Placement: Decodable {
 }
 
 public struct HorizonSegment: Decodable { public var rows: [Int]; public var row: Int; public var origin: Double; public var sector: [Double]? }
+/// One strip of the pod's 3584-px horizon panorama: `height` rows of 512 pixels starting at `offset` in the sheet stream.
+public struct HorizonStrip: Decodable { public var offset: Int; public var height: Int }
 public struct Horizon: Decodable {
     public var width: Int, rows: Int
     public var data: String                 // base64 palette indices, row-major
     public var segments: [HorizonSegment]
     public var px_per_degree: Double
     public var pitch_rows: Double
+    public var strips: [HorizonStrip]?      // panorama order (strip i sits 512*i px along the panorama); nil = legacy segments
     public var pixels: [UInt8] { [UInt8](Data(base64Encoded: data) ?? Data()) }
 }
 
