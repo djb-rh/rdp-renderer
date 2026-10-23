@@ -1,4 +1,0 @@
-module RDPKit {
-header "RDPKit-Swift.h"
-export *
-}

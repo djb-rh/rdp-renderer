@@ -1,4 +1,7 @@
 .build/
-*.xcodeproj
+build/
+ios/build/
 xcuserdata/
 .DS_Store
+# a stray module-cache folder a build command once left inside the project
+ios/RDPView.xcodeproj/-Xcc/
